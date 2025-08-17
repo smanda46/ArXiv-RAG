@@ -1,122 +1,121 @@
-# PDF-RAG: Retrieval-Augmented Generation for ArXiv Papers
+# ArXiv-RAG: Retrieval-Augmented Generation for Research Papers
 
-This project implements a **Retrieval-Augmented Generation (RAG)** pipeline tailored to handle ArXiv papers. It focuses on multi-format content (text, images, tables) in PDFs, enabling efficient query-based retrieval and response generation.
+ArXiv-RAG is an end-to-end **Retrieval-Augmented Generation (RAG) pipeline** built to make research papers from [arXiv.org](https://arxiv.org) more searchable and useful. The system goes beyond plain text search by processing **text, images, tables, and even math formulas** inside PDFs, then serving relevant context to a Language Model for accurate, query-driven answers.
 
 ---
 
-## Project Structure
+## Project Layout
 
 ```
-pdf-rag/
-├── .git/                # Git version control folder
-├── backend/             # Backend logic for RAG pipeline
-├── faiss_storage/       # FAISS index storage for vectorized embeddings
-├── json_vectorization/  # Handles JSON-based text and image vectorization
-├── llm-integration/     # Code for integrating with Language Models
-├── pdf_scraping/        # Scripts for scraping and downloading ArXiv PDFs
-├── pdf-rag-venv/        # Python virtual environment
-├── rocks_storage/       # RocksDB storage for key-value metadata
-├── tests/               # Unit and integration test cases
-├── .gitignore           # Files and folders to ignore in Git
-├── Dockerfile           # Docker configuration for containerizing the app
-├── handler/             # API or main service handler
-├── main.py              # Main entry point of the application
-├── README.md            # Project documentation
-```
+
+ArXiv-RAG/
+├── backend/             # Core backend logic for serving queries
+├── faiss\_storage/       # FAISS index files for vector embeddings
+├── json\_vectorization/  # Scripts for text & image embedding generation
+├── llm-integration/     # Glue code for integrating with LLMs
+├── pdf\_scraping/        # ArXiv PDF downloader & preprocessing scripts
+├── rocks\_storage/       # RocksDB storage for metadata
+├── tests/               # Unit & integration tests
+├── handler/             # API or main service entrypoint
+├── main.py              # Application bootstrap
+├── Dockerfile           # Container setup for deployment
+├── .gitignore           # Git ignore rules
+└── README.md            # Project docs (this file)
+
+````
+
+*(virtual env, Git internals, and generated data directories excluded for clarity)*
 
 ---
 
 ## Features
 
-1. **PDF Scraping**: Automatically downloads and preprocesses ArXiv papers from a specified topic and time range.
-2. **Metadata Storage**:
-   - RocksDB for fast key-value lookups of structured metadata.
-   - FAISS for vector-based similarity searches.
-3. **Vectorization**: Text and images from papers are converted to 512-dimensional embeddings using OpenAI's CLIP model.
-4. **RAG Integration**: Retrieval-Augmented Generation ensures that user queries retrieve relevant content and generate coherent responses.
-5. **LLM Integration**: Combines metadata and embeddings for accurate, context-specific responses.
+- **Automated PDF Scraping**  
+  Fetch and preprocess ArXiv papers by topic or time range.
+
+- **Smart Metadata Storage**  
+  - **RocksDB** → lightning-fast key-value lookups  
+  - **FAISS** → high-performance vector similarity search
+
+- **Text & Image Vectorization**  
+  Embeds text, figures, and formulas into **512-dim CLIP embeddings**.
+
+- **RAG Workflow**  
+  Retrieves top-k relevant chunks and feeds them into an LLM for context-aware responses.
+
+- **LLM Integration**  
+  Combines embeddings and metadata for precise, human-like answers.
 
 ---
 
 ## Prerequisites
 
-- **Python Version**: 3.10 or higher
-- **Libraries**:
-  - `arxiv`
-  - `requests`
-  - `PyPDF2`
-  - `pandas`
-  - `tqdm`
-  - `faiss`
-  - `rockdb-python`
-  - `clip`
-  - `torch`
-  - `langchain`
-- **Optional**: Docker for containerized deployment
+- **Python**: 3.10+
+- **Libraries**:  
+  `arxiv`, `requests`, `PyPDF2`, `pandas`, `tqdm`,  
+  `faiss`, `rocksdb-python`, `clip`, `torch`, `langchain`
+- **Optional**: Docker for containerized runs
 
 ---
 
 ## Setup
 
-1. Clone the repository:
+Clone the repo:
+```bash
+git clone https://github.com/smanda46/ArXiv-RAG.git
+cd ArXiv-RAG
+````
 
-   ```bash
-   git clone <repository-url>
-   cd pdf-rag
-   ```
+Create and activate a virtual environment:
 
-2. Set up the virtual environment:
+```bash
+python3 -m venv pdf-rag-venv
+source pdf-rag-venv/bin/activate   # Linux/Mac
+pdf-rag-venv\Scripts\activate      # Windows
+```
 
-   ```bash
-   python3 -m venv pdf-rag-venv
-   source pdf-rag-venv/bin/activate  # Linux/Mac
-   pdf-rag-venv\Scripts\activate     # Windows
-   ```
+Install dependencies:
 
-3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Configure environment variables (if required) in `.env`.
+(Optional) configure environment variables in a `.env` file.
 
 ---
 
 ## Usage
 
-### 1. Scrape PDFs
+1. **Scrape PDFs**
 
-Run the scraper to download and preprocess ArXiv papers:
+   ```bash
+   python pdf_scraping/main.py
+   ```
 
-```bash
-python pdf_scraping/main.py
-```
+2. **Vectorize content**
 
-### 2. Vectorize Content
+   ```bash
+   python json_vectorization/vectorize.py
+   ```
 
-Convert the scraped content into embeddings:
+3. **Run backend API**
 
-```bash
-python json_vectorization/vectorize.py
-```
-
-### 3. Run the Backend
-
-Start the backend server to handle user queries:
-
-```bash
-python main.py
-```
+   ```bash
+   python main.py
+   ```
 
 ---
 
-## Future Enhancements
+## Roadmap
 
-- Cloud-based object storage for scalability.
-- Real-time querying through web-based UI.
-- Support for additional academic repositories.
+* Migrate vector/metadata storage to cloud backends for scalability
+* Add a lightweight web UI for real-time queries
+* Expand support to other academic repositories (e.g., PubMed, IEEE Xplore)
 
 ---
 
-For detailed information, refer to individual module documentation or contact the contributors.
+## Notes
+
+This project was built as a modular, research-friendly pipeline to help students, researchers, and developers interact with dense academic PDFs in a more natural way. Each stage is decoupled, making it easy to extend, swap, or scale.
+
+---
